@@ -1,0 +1,23 @@
+.button-container {
+    text-align: center;
+}
+
+.button-container button {
+    margin: 0 5px;  /* optional: adds space between buttons */
+}
+
+.fotorama-container {
+    display: flex;
+    justify-content: center;
+    width: 75%;
+}
+
+.fotorama {
+    margin: 0 auto;
+}
+h4 {
+    text-align: center;
+}
+p {
+    text-align: center;
+}
