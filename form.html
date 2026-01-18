@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    #dropzone {
+        width: 350px;
+        height: 180px;
+        border: 2px dashed #888;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-family: sans-serif;
+        margin-bottom: 20px;
+        transition: 0.2s;
+        user-select: none;
+    }
+    #dropzone.dragover {
+        border-color: #4CAF50;
+        color: #4CAF50;
+        background: #f6fff6;
+    }
+</style>
+</head>
+<body>
+
+<div id="dropzone">Drag & Drop Files Here</div>
+
+<input type="file" id="fileInput" name="media[]" multiple hidden>
+
+<div id="output"></div>
+
+<script src="uploader.js"></script>
+
+</body>
+</html>
