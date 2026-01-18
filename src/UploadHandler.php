@@ -9,7 +9,7 @@ class UploadHandler
     public function __construct(
         string $targetDir = "uploads/",
         array $allowedTypes = ["image/jpeg", "image/png", "video/mp4"],
-        int $maxSize = 20_000_000 // 20MB
+        int $maxSize = 20_000_000
     ) {
         $this->targetDir = rtrim($targetDir, "/") . "/";
         $this->allowedTypes = $allowedTypes;
