@@ -31,8 +31,8 @@ if ($baseDir === false) {
     $baseDir = realpath(__DIR__ . "/chunks");
 }
 
-// Derive a safe, non-user-controlled directory name from fileId
-// This breaks the taint flow into mkdir and satisfies Snyk
+// Convert user-controlled fileId into a safe internal directory name
+// This breaks the taint flow and satisfies Snyk
 $safeDirName = hash('sha256', $fileId);
 
 // Build chunk directory path using safeDirName only
