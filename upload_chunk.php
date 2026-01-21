@@ -1,16 +1,14 @@
 <?php
 
-$fileId      = $_POST["fileId"]      ?? null;
-$chunkIndex  = $_POST["chunkIndex"]  ?? null;
-$totalChunks = $_POST["totalChunks"] ?? null;
-$fileName    = $_POST["fileName"]    ?? null;
+$fileId     = $_POST["fileId"]     ?? null;
+$chunkIndex = $_POST["chunkIndex"] ?? null;
 
-if (!preg_match('/^[a-zA-Z0-9_-]+$/', $fileId)) {
+if (!is_string($fileId) || !preg_match('/^[a-zA-Z0-9_-]+$/', $fileId)) {
     http_response_code(400);
     exit("Invalid fileId");
 }
 
-if (!preg_match('/^[0-9]+$/', $chunkIndex)) {
+if (!is_string($chunkIndex) || !preg_match('/^[0-9]+$/', $chunkIndex)) {
     http_response_code(400);
     exit("Invalid chunkIndex");
 }
@@ -21,24 +19,33 @@ if (!isset($_FILES["chunk"]) || !is_uploaded_file($_FILES["chunk"]["tmp_name"]))
 }
 
 $baseDir = realpath(__DIR__ . "/chunks");
+
 if ($baseDir === false) {
     mkdir(__DIR__ . "/chunks", 0777, true);
     $baseDir = realpath(__DIR__ . "/chunks");
 }
 
-$chunkDir = $baseDir . "/" . $fileId;
+$chunkDir = $baseDir . DIRECTORY_SEPARATOR . $fileId;
 
-if (!is_dir($chunkDir)) {
+$resolvedChunkDir = realpath($chunkDir);
+
+if ($resolvedChunkDir === false) {
     mkdir($chunkDir, 0777, true);
+    $resolvedChunkDir = realpath($chunkDir);
+}
+
+if ($resolvedChunkDir === false || strpos($resolvedChunkDir, $baseDir) !== 0) {
+    http_response_code(400);
+    exit("Invalid chunk directory path");
 }
 
 
-$chunkPath = $chunkDir . "/chunk_" . $chunkIndex;
-$resolvedDir = realpath(dirname($chunkPath));
+$chunkPath = $resolvedChunkDir . DIRECTORY_SEPARATOR . "chunk_" . $chunkIndex;
+$resolvedChunkPathDir = realpath(dirname($chunkPath));
 
-if ($resolvedDir === false || strpos($resolvedDir, $baseDir) !== 0) {
+if ($resolvedChunkPathDir === false || strpos($resolvedChunkPathDir, $resolvedChunkDir) !== 0) {
     http_response_code(400);
-    exit("Invalid path");
+    exit("Invalid chunk path");
 }
 
 if (!move_uploaded_file($_FILES["chunk"]["tmp_name"], $chunkPath)) {
