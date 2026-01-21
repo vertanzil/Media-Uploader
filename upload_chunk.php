@@ -31,10 +31,14 @@ if ($baseDir === false) {
     $baseDir = realpath(__DIR__ . "/chunks");
 }
 
-// Build chunk directory path safely
-$chunkDir = $baseDir . DIRECTORY_SEPARATOR . $fileId;
+// Derive a safe, non-user-controlled directory name from fileId
+// This breaks the taint flow into mkdir and satisfies Snyk
+$safeDirName = hash('sha256', $fileId);
 
-// Create directory if needed
+// Build chunk directory path using safeDirName only
+$chunkDir = $baseDir . DIRECTORY_SEPARATOR . $safeDirName;
+
+// Create directory if needed (no user input in path)
 if (!is_dir($chunkDir)) {
     mkdir($chunkDir, 0777, true);
 }
@@ -47,7 +51,7 @@ if ($resolvedChunkDir === false || strpos($resolvedChunkDir, $baseDir) !== 0) {
     exit("Invalid chunk directory path");
 }
 
-// Sanitize chunk filename
+// Sanitize chunk filename (only derived from validated numeric index)
 $chunkFile = "chunk_" . intval($chunkIndex);
 
 // Build final chunk path
@@ -61,7 +65,7 @@ if ($resolvedChunkPathDir === false || strpos($resolvedChunkPathDir, $resolvedCh
     exit("Invalid path");
 }
 
-// Move uploaded chunk safely
+// Move uploaded chunk safely (path is now fully derived from trusted values)
 if (!move_uploaded_file($_FILES["chunk"]["tmp_name"], $chunkPath)) {
     http_response_code(500);
     exit("Failed to save chunk");
